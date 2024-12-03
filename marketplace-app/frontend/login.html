@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Sign-Up</title>
+    <!-- Reference your existing CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="form-container">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label for="loginUsername">Username:</label>
+                <input type="text" id="loginUsername" name="username" placeholder="Enter your username" required>
+                
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
+                
+                <button type="submit">Login</button>
+                <p>Don't have an account? <a href="#signup-section">Sign-Up</a></p>
+            </form>
+        </div>
+
+        <!-- Sign-Up Form -->
+        <div class="form-container" id="signup-section">
+            <h2>Sign-Up</h2>
+            <form id="signUpForm">
+                <label for="signupUsername">Username:</label>
+                <input type="text" id="signupUsername" name="username" placeholder="Enter your username" required>
+                
+                <label for="signupPassword">Password:</label>
+                <input type="password" id="signupPassword" name="password" placeholder="Enter your password" required>
+                
+                <button type="submit">Sign-Up</button>
+                <p>Already have an account? <a href="#login-section">Login</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript to handle form submission -->
+    <script>
+        // Your API Gateway URL
+        const apiEndpoint = "https://p3r2913g25.execute-api.us-east-1.amazonaws.com/prod";
+
+        // Login form submission handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent form submission
+
+            // Fetch user inputs
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!username || !password) {
+                alert('Both username and password are required for login.');
+                return;
+            }
+
+            try {
+                // Send POST request to authenticate user (for better security)
+                const response = await fetch(`${apiEndpoint}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    // Redirect to index.html on success
+                    alert(result.message);
+                    window.location.href = 'index.html';
+                } else {
+                    alert(result.message || 'Authentication failed. Please check your credentials.');
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+                alert('Something went wrong while logging in. Please try again later.');
+            }
+        });
+
+        // Sign-up form submission handler
+        document.getElementById('signUpForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent form submission
+
+            // Fetch user inputs
+            const username = document.getElementById('signupUsername').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+
+            if (!username || !password) {
+                alert('Both username and password are required for sign-up.');
+                return;
+            }
+
+            try {
+                // Send POST request to register user
+                const response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    document.getElementById('signUpForm').reset(); // Reset form on success
+                    window.location.href = '#login-section'; // Redirect to login after sign-up
+                } else {
+                    alert(result.message || 'Sign-Up failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during sign-up:', error);
+                alert('Something went wrong while signing up. Please try again later.');
+            }
+        });
+    </script>
+</body>
+</html>
